@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# bin/startup - Unix startup script for yazi plugin
+# Currently a no-op since we use native plugin pane open
+
+exit 0
