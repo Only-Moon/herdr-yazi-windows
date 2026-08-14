@@ -20,8 +20,8 @@
 ## What it does
 
 - `[[build]]`: Checks for `yazi` in PATH, installs via Homebrew (macOS/Linux) or shows Windows installation options.
-- `[[actions]] open`: Reads the triggering pane/workspace directory from herdr's context and opens a split pane via `herdr plugin pane open --placement split --cwd`.
-- `[[actions]] open-tab`: Same as above, but opens in a new tab with `--placement tab`.
+- `[[actions]] open` / `open-windows`: Reads the triggering pane/workspace directory from herdr's context and opens a split pane via `herdr plugin pane open --placement split --cwd`.
+- `[[actions]] open-tab` / `open-tab-windows`: Same as above, but opens in a new tab with `--placement tab`.
 - `[[panes]] explorer`: Runs `exec yazi` inside the pane — that's it.
 
 Directory resolution priority: `$HERDR_EXPLORER_DIR` → `HERDR_PLUGIN_CONTEXT_JSON`'s `focused_pane_cwd`/`workspace_cwd` → current directory.
@@ -38,17 +38,17 @@ winget install yazi
 # 2. Install the plugin
 herdr plugin install Only-Moon/herdr-yazi-windows
 
-# 3. Add keybindings (note the -windows suffix for Windows-specific actions)
+# 3. Add keybindings (use -windows actions for native Windows support)
 [[keys.command]]
 key = "prefix+y"
 type = "plugin_action"
-command = "ray.file-explorer.open-windows"
+command = "moon.file-explorer.open-windows"
 description = "open file explorer (split)"
 
 [[keys.command]]
 key = "prefix+Y"
 type = "plugin_action"
-command = "ray.file-explorer.open-tab-windows"
+command = "moon.file-explorer.open-tab-windows"
 description = "open file explorer in new tab"
 ```
 
@@ -63,13 +63,13 @@ herdr plugin install Only-Moon/herdr-yazi-windows
 [[keys.command]]
 key = "prefix+y"
 type = "plugin_action"
-command = "ray.file-explorer.open"
+command = "moon.file-explorer.open"
 description = "open file explorer"
 
 [[keys.command]]
 key = "prefix+Y"
 type = "plugin_action"
-command = "ray.file-explorer.open-tab"
+command = "moon.file-explorer.open-tab"
 description = "open file explorer in a new tab"
 ```
 
@@ -81,7 +81,7 @@ Since herdr v0.8.0, native Windows pane spawning is fully supported:
 
 - **Native pane spawning** — Uses herdr's `CreateProcessW` to spawn `yazi` directly as the pane's PID 1 (no shell, instant startup)
 - **PATH shim** — Build script creates a symlink at `~/.local/bin/yazi.exe` so `command = ["yazi"]` works natively
-- **Native launchers** — `open-windows` and `open-tab-windows` use native `plugin pane open`
+- **Native launchers** — `open-windows` and `open-tab-windows` use native `plugin pane open` with version detection & fallback
 - **Backward compatibility** — On herdr < v0.8.0, scripts fall back to `pane split` + `pane run` + `send-keys`
 
 ### Windows Requirements
@@ -99,11 +99,13 @@ This plugin defines no keys of its own — the pane runs plain Yazi, so all keyb
 # Local development
 herdr plugin link /path/to/herdr-yazi   # local dev link (skips build step)
 
-# Test actions
-herdr plugin action invoke ray.file-explorer.open
-herdr plugin action invoke ray.file-explorer.open-tab
-herdr plugin action invoke ray.file-explorer.open-windows
-herdr plugin action invoke ray.file-explorer.open-tab-windows
+# Test actions (cross-platform)
+herdr plugin action invoke moon.file-explorer.open
+herdr plugin action invoke moon.file-explorer.open-tab
+
+# Test actions (Windows native)
+herdr plugin action invoke moon.file-explorer.open-windows
+herdr plugin action invoke moon.file-explorer.open-tab-windows
 ```
 
 `bin/resolve-dir.sh` is a standalone shell script testable without herdr:
