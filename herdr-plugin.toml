@@ -41,7 +41,7 @@ title = "Open file explorer"
 description = "Open Yazi in a split pane"
 platforms = ["macos", "linux", "windows"]
 contexts = ["global", "workspace", "tab"]
-command = ["bash", "-c", "DIR=\"$(bash \"$HERDR_PLUGIN_ROOT/bin/resolve-dir.sh\")\"; exec \"${HERDR_BIN_PATH:-herdr}\" plugin pane open --plugin ray.file-explorer --entrypoint explorer --placement split --cwd \"$DIR\""]
+command = ["bash", "-c", "DIR=\"$(bash \"$HERDR_PLUGIN_ROOT/bin/resolve-dir.sh\")\"; OUT=\"$(exec \"${HERDR_BIN_PATH:-herdr}\" plugin pane open --plugin ray.file-explorer --entrypoint explorer --placement split --cwd \"$DIR\")\"; PANE_ID=\"$(printf '%s' \"$OUT\" | python3 -c 'import sys, json; r=json.load(sys.stdin).get(\"result\",{}); pane=r.get(\"plugin_pane\",{}).get(\"pane\",{}); print(pane.get(\"pane_id\",\"\"), end=\"\")' 2>/dev/null || true)\"; [ -n \"$PANE_ID\" ] && \"${HERDR_BIN_PATH:-herdr}\" pane rename \"$PANE_ID\" \"yazi\" >/dev/null 2>&1 || true"]
 
 [[actions]]
 id = "open-tab"
@@ -49,7 +49,7 @@ title = "Open file explorer in new tab"
 description = "Open Yazi in a new tab"
 platforms = ["macos", "linux", "windows"]
 contexts = ["global", "workspace", "tab"]
-command = ["bash", "-c", "DIR=\"$(bash \"$HERDR_PLUGIN_ROOT/bin/resolve-dir.sh\")\"; exec \"${HERDR_BIN_PATH:-herdr}\" plugin pane open --plugin ray.file-explorer --entrypoint explorer --placement tab --cwd \"$DIR\""]
+command = ["bash", "-c", "DIR=\"$(bash \"$HERDR_PLUGIN_ROOT/bin/resolve-dir.sh\")\"; OUT=\"$(exec \"${HERDR_BIN_PATH:-herdr}\" plugin pane open --plugin ray.file-explorer --entrypoint explorer --placement tab --cwd \"$DIR\")\"; TAB_ID=\"$(printf '%s' \"$OUT\" | python3 -c 'import sys, json; r=json.load(sys.stdin).get(\"result\",{}); pane=r.get(\"plugin_pane\",{}).get(\"pane\",{}); print(pane.get(\"tab_id\",\"\"), end=\"\")' 2>/dev/null || true)\"; [ -n \"$TAB_ID\" ] && \"${HERDR_BIN_PATH:-herdr}\" tab rename \"$TAB_ID\" \"yazi\" >/dev/null 2>&1 || true"]
 
 # Windows-specific actions with version detection & fallback
 [[actions]]

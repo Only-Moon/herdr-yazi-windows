@@ -10,13 +10,17 @@ if [ -n "${HERDR_EXPLORER_DIR:-}" ]; then
   exit 0
 fi
 if [ -n "${HERDR_PLUGIN_CONTEXT_JSON:-}" ]; then
-  DIR="$(node -e '
-    try {
-      const ctx = JSON.parse(process.env.HERDR_PLUGIN_CONTEXT_JSON);
-      const dir = ctx.focused_pane_cwd || ctx.workspace_cwd;
-      if (typeof dir === "string" && dir) process.stdout.write(dir);
-    } catch {}
-  ')"
+  DIR="$(HERDR_CTX="$HERDR_PLUGIN_CONTEXT_JSON" python3 - <<'PY'
+import json, os
+try:
+    ctx = json.loads(os.environ.get("HERDR_CTX", "") or "{}")
+    d = ctx.get("focused_pane_cwd") or ctx.get("workspace_cwd") or ""
+    if isinstance(d, str) and d:
+        print(d, end="")
+except Exception:
+    pass
+PY
+)"
   if [ -n "$DIR" ]; then
     printf '%s\n' "$DIR"
     exit 0
