@@ -10,6 +10,7 @@ $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 $OutputEncoding = $Utf8NoBom
 
 $HerdrBin = if ($env:HERDR_BIN_PATH) { $env:HERDR_BIN_PATH } else { 'herdr' }
+$PluginId = "moon.file-explorer"
 
 function Strip-Verbatim([string]$p) {
     if ($p -and $p.StartsWith('\\?\')) { return $p.Substring(4) }
@@ -63,7 +64,7 @@ $hasNativeSupport = Test-NativePaneSupport
 
 if ($hasNativeSupport) {
     # Native: plugin pane open spawns yazi directly as pane PID 1
-    $out = & $HerdrBin plugin pane open --plugin ray.file-explorer --entrypoint explorer --placement split --cwd $cwd
+    $out = & $HerdrBin plugin pane open --plugin $PluginId --entrypoint explorer --placement split --cwd $cwd
     
     # Extract pane_id from response and rename pane to "yazi"
     $paneId = Get-PaneIdFromOutput $out

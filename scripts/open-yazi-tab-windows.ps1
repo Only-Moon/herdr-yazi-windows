@@ -10,6 +10,7 @@ $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 $OutputEncoding = $Utf8NoBom
 
 $HerdrBin = if ($env:HERDR_BIN_PATH) { $env:HERDR_BIN_PATH } else { 'herdr' }
+$PluginId = "moon.file-explorer"
 
 # Check if herdr version supports native Windows pane spawning (v0.8.0+)
 function Test-NativePaneSupport {
@@ -56,7 +57,7 @@ $hasNativeSupport = Test-NativePaneSupport
 
 if ($hasNativeSupport) {
     # Native: plugin pane open with tab placement - capture output to get tab_id
-    $out = & $HerdrBin plugin pane open --plugin ray.file-explorer --entrypoint explorer --placement tab --cwd $cwd
+    $out = & $HerdrBin plugin pane open --plugin $PluginId --entrypoint explorer --placement tab --cwd $cwd
     
     # Extract tab_id from response
     $tabId = Get-TabIdFromOutput $out
