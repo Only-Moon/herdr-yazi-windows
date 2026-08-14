@@ -1,6 +1,5 @@
 # herdr-yazi-windows
 
-[![CI](https://github.com/Only-Moon/herdr-yazi-windows/actions/workflows/ci.yml/badge.svg)](https://github.com/Only-Moon/herdr-yazi-windows/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![herdr 0.8+](https://img.shields.io/badge/herdr-0.8%2B-8a2be2)
 ![platforms: linux • macOS • Windows](https://img.shields.io/badge/platforms-linux%20%E2%80%A2%20macOS%20%E2%80%A2%20Windows-informational)
