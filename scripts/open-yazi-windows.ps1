@@ -45,6 +45,17 @@ function Get-UserCwd {
     return (Get-Location).Path
 }
 
+# Extract pane_id from plugin pane open JSON output
+function Get-PaneIdFromOutput {
+    param([string]$JsonOutput)
+    try {
+        $data = $JsonOutput | ConvertFrom-Json
+        $pane = $data.result.plugin_pane.pane
+        return $pane.pane_id
+    } catch {}
+    return $null
+}
+
 $cwd = Get-UserCwd
 
 # Check for native pane support (v0.8.0+)
@@ -52,7 +63,14 @@ $hasNativeSupport = Test-NativePaneSupport
 
 if ($hasNativeSupport) {
     # Native: plugin pane open spawns yazi directly as pane PID 1
-    & $HerdrBin plugin pane open --plugin ray.file-explorer --entrypoint explorer --placement split --cwd $cwd
+    $out = & $HerdrBin plugin pane open --plugin ray.file-explorer --entrypoint explorer --placement split --cwd $cwd
+    
+    # Extract pane_id from response and rename pane to "yazi"
+    $paneId = Get-PaneIdFromOutput $out
+    if ($paneId) {
+        Start-Sleep -Milliseconds 300
+        & $HerdrBin pane rename $paneId "yazi" *>$null
+    }
 } else {
     # Fallback: pane split + pane run (old workaround)
     $splitArgs = @('pane', 'split', '--direction', 'right', '--cwd', $cwd, '--focus')
@@ -63,7 +81,7 @@ if ($hasNativeSupport) {
         & $HerdrBin pane run $paneId "yazi"
         Start-Sleep -Milliseconds 1000
         & $HerdrBin pane send-keys $paneId Enter
-        & $HerdrBin pane rename $paneId "Yazi" *>$null
+        & $HerdrBin pane rename $paneId "yazi" *>$null
     }
 }
 

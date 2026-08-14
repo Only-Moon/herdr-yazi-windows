@@ -38,18 +38,34 @@ function Get-UserCwd {
     return (Get-Location).Path
 }
 
+# Extract tab_id from plugin pane open JSON output
+function Get-TabIdFromOutput {
+    param([string]$JsonOutput)
+    try {
+        $data = $JsonOutput | ConvertFrom-Json
+        $pane = $data.result.plugin_pane.pane
+        return $pane.tab_id
+    } catch {}
+    return $null
+}
+
 $cwd = Get-UserCwd
 
 # Check for native pane support (v0.8.0+)
 $hasNativeSupport = Test-NativePaneSupport
 
 if ($hasNativeSupport) {
-    # Native: plugin pane open with tab placement
-    & $HerdrBin plugin pane open --plugin ray.file-explorer --entrypoint explorer --placement tab --cwd $cwd
+    # Native: plugin pane open with tab placement - capture output to get tab_id
+    $out = & $HerdrBin plugin pane open --plugin ray.file-explorer --entrypoint explorer --placement tab --cwd $cwd
     
-    # Set tab name to "yazi"
-    Start-Sleep -Milliseconds 500
-    & $HerdrBin tab rename "yazi" *>$null
+    # Extract tab_id from response
+    $tabId = Get-TabIdFromOutput $out
+    
+    # Set tab name to "yazi" using the tab_id
+    if ($tabId) {
+        Start-Sleep -Milliseconds 300
+        & $HerdrBin tab rename $tabId "yazi" *>$null
+    }
 } else {
     # Fallback: tab create + pane run
     $tabArgs = @('tab', 'create', '--cwd', $cwd, '--focus')
@@ -64,7 +80,7 @@ if ($hasNativeSupport) {
             Start-Sleep -Milliseconds 1000
             & $HerdrBin pane send-keys $paneId Enter
             & $HerdrBin pane rename $paneId "Yazi" *>$null
-            & $HerdrBin tab rename "yazi" *>$null
+            & $HerdrBin tab rename $tabId "yazi" *>$null
         }
     }
 }
